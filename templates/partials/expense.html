@@ -1,0 +1,266 @@
+<style>
+    .dashboard-card {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(17, 17, 17, 0.12);
+        border-radius: 24px;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.06);
+    }
+
+    .dashboard-card .card-body {
+        padding: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 0;
+    }
+
+    .total-pill {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(17, 17, 17, 0.12);
+        border-radius: 999px;
+        background: #f7f7f7;
+        padding: 0.6rem 1rem;
+        font-weight: 600;
+    }
+
+    .expense-grid-card {
+        min-height: 150px;
+        border: 1px solid rgba(17, 17, 17, 0.12);
+        border-radius: 22px;
+        background: linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
+        text-align: left;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .expense-grid-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(17, 17, 17, 0.3);
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .expense-grid-card .category-name {
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    .expense-grid-card .category-amount {
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+    }
+
+    .expense-grid-card .category-meta {
+        color: #6c757d;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+    }
+
+    .modal-content {
+        border: 1px solid rgba(17, 17, 17, 0.12);
+        border-radius: 28px;
+        overflow: hidden;
+        background: linear-gradient(180deg, #ffffff 0%, #f6f6f6 100%);
+        box-shadow: 0 28px 60px rgba(0, 0, 0, 0.18);
+    }
+
+    .modal-header {
+        background: #111111;
+        color: #ffffff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 1.15rem 1.35rem;
+    }
+
+    .modal-header .btn-close {
+        filter: invert(1) grayscale(100%);
+        opacity: 0.9;
+    }
+
+    .modal-body {
+        padding: 1.5rem 1.35rem 1rem;
+    }
+
+    .modal-footer {
+        background: transparent;
+        border-top: 1px solid rgba(17, 17, 17, 0.08);
+        padding: 1rem 1.35rem 1.35rem;
+    }
+
+    .modal-kicker {
+        display: inline-block;
+        margin-bottom: 0.75rem;
+        color: #6c757d;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .modal-title {
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 14px;
+        border-color: rgba(17, 17, 17, 0.14);
+        padding: 0.8rem 0.95rem;
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .modal-note {
+        border: 1px solid rgba(17, 17, 17, 0.08);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.75);
+        padding: 0.85rem 1rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #111111;
+        box-shadow: 0 0 0 0.2rem rgba(17, 17, 17, 0.08);
+    }
+</style>
+
+<div class="card dashboard-card border-0">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+            <div>
+                <h3 class="section-title">Expense Categories</h3>
+                <p class="text-muted mb-0">Tap a card to add a new expense to that category.</p>
+            </div>
+            <div class="total-pill text-dark">
+                Total: P{{ "%.2f"|format(total_expense) }}
+            </div>
+        </div>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3"> 
+            <div class="col">
+                <button type="button" class="expense-grid-card p-4 w-100 btn" onclick="openExpenseModal('Food')">
+                    <div class="category-meta mb-3">Category</div>
+                    <div class="category-name">Food</div>
+                    <div class="category-amount mt-3">
+                        P{{ "%.2f"|format((expense_totals | default({})).get("Food", 0.00))}}
+                    </div>
+                </button>
+            </div>
+
+            <div class="col">
+                <button type="button" class="expense-grid-card p-4 w-100 btn" onclick="openExpenseModal('Transport')">
+                    <div class="category-meta mb-3">Category</div>
+                    <div class="category-name">Transport</div>
+                    <div class="category-amount mt-3">
+                        P{{ "%.2f"|format((expense_totals | default({})).get("Transport", 0.00))}}
+                    </div>
+                </button>
+            </div>
+
+            <div class="col">
+                <button type="button" class="expense-grid-card p-4 w-100 btn" onclick="openExpenseModal('Home Bills')">
+                    <div class="category-meta mb-3">Category</div>
+                    <div class="category-name">Home Bills</div>
+                    <div class="category-amount mt-3">
+                        P{{ "%.2f"|format((expense_totals | default({})).get("Home Bills", 0.00))}}
+                    </div>
+                </button>
+            </div>
+
+            <div class="col">
+                <button type="button" class="expense-grid-card p-4 w-100 btn" onclick="openExpenseModal('Self-Care')">
+                    <div class="category-meta mb-3">Category</div>
+                    <div class="category-name">Self-Care</div>
+                    <div class="category-amount mt-3">
+                        P{{ "%.2f"|format((expense_totals | default({})).get("Self-Care", 0.00))}}
+                    </div>
+                </button>
+            </div>
+
+            <div class="col">
+                <button type="button" class="expense-grid-card p-4 w-100 btn" onclick="openExpenseModal('Shopping')">
+                    <div class="category-meta mb-3">Category</div>
+                    <div class="category-name">Shopping</div>
+                    <div class="category-amount mt-3">
+                        P{{ "%.2f"|format((expense_totals | default({})).get("Shopping", 0.00))}}
+                    </div>
+                </button>
+            </div>
+
+            <div class="col">
+                <button type="button" class="expense-grid-card p-4 w-100 btn" onclick="openExpenseModal('Health')">
+                    <div class="category-meta mb-3">Category</div>
+                    <div class="category-name">Health</div>
+                    <div class="category-amount mt-3">
+                        P{{ "%.2f"|format((expense_totals | default({})).get("Health", 0.00))}}
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="expenseModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
+    <div class="modal-fullscreen-sm-down modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="expenseModalLabel"> Add Expense to Food </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> 
+            </div>
+
+            <form action="/add_expense" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="category" id="modalCategoryInput">
+                    <input type="hidden" name="category_type" value="expense">
+
+                    <div class="modal-kicker">New Entry</div>
+                    <div class="modal-note mb-4">
+                        Fill in the amount, a short description, and the date for this expense.
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="amount" class="form-label"> How much did you spend? </label>
+                        <input type="number" step="0.01" class="form-control" name="amount" required autofocus placeholder="0.00">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label"> Description: </label>
+                        <input type="text" class="form-control" name="description" placeholder="Description">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="date" class="form-label"> Date </label>
+                        <input type="date" class="form-control" name="date" id="modalDateInput" required> 
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal"> Cancel </button>
+                        <button type="submit" class="btn btn-dark"> Save Expense </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openExpenseModal(categoryName) {
+        document.getElementById('expenseModalLabel').innerText = "Add Expense to " + categoryName;
+        document.getElementById('modalCategoryInput').value = categoryName;
+
+        document.getElementById("modalDateInput").value = "{{ selected_date }}";
+        
+        var myModal = new bootstrap.Modal(document.getElementById('expenseModal'));
+        myModal.show();
+    }
+</script>

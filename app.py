@@ -75,15 +75,7 @@ def user_category(cursor, category_name, category_type, user):
     if result:
         return result[0]
     else:
-        cursor.execute(
-            """
-            insert into categories (user_id, category_name, category_type, is_default)
-            values (%s, %s, %s, %s)
-            """,
-            (user, category_name, "expense", False)
-        )
-
-        return cursor.lastrowid
+        return None
     
 def insert_transaction(cursor, user, category_id, amount, description, date):
     cursor.execute(
@@ -172,7 +164,7 @@ def total_expenses(cursor, user, selected_date):
         select sum(amount)
         from transactions
         where user_id = %s
-        and transaction_type = "expense"
+        and transaction_type = 'expense'
         and transaction_date = %s
         """,
         (user, selected_date)
@@ -186,7 +178,7 @@ def total_incomee(cursor, user, selected_date):
         select sum(amount)
         from transactions
         where user_id = %s
-        and transaction_type = "income"
+        and transaction_type = 'income'
         and transaction_date = %s
         """,
         (user, selected_date)
